@@ -1,29 +1,47 @@
 package independent_study.multiplayer;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.telephony.SmsMessage;
 
-public class MainActivity extends AppCompatActivity {
+import independent_study.multiplayer.nfc.InterpreterNFC;
+import independent_study.multiplayer.sms.BroadcastReceiverSMS;
+import independent_study.multiplayer.sms.ListenerSMS;
+import independent_study.multiplayer.util.DispatchActivity;
 
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
+public class MainActivity extends DispatchActivity implements ListenerSMS, NfcAdapter.OnNdefPushCompleteCallback,
+{
+    private BroadcastReceiverSMS receiverSMS;
+    private InterpreterNFC interpreterNFC;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+        receiverSMS = BroadcastReceiverSMS.getInstance();
+        receiverSMS.addListener(this);
+
+        interpreterNFC = new InterpreterNFC(this);
+        interpreterNFC
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    public void onSMSReceived(SmsMessage message)
+    {
+
+    }
+
+    @Override
+    public void onNewIntent(Intent intent)
+    {
+
+    }
+
+    public void onNdefPushComplete(NfcEvent nfcEvent)
+    {
+
+    }
 }

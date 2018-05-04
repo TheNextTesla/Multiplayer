@@ -4,7 +4,7 @@
 extern "C" JNIEXPORT jstring
 
 JNICALL
-Java_independent_1study_multiplayer_MainActivity_stringFromJNI(
+Java_independent_1study_multiplayer_util_NativeBridge_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
