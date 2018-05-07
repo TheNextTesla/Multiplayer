@@ -11,7 +11,7 @@ import independent_study.multiplayer.sms.BroadcastReceiverSMS;
 import independent_study.multiplayer.sms.ListenerSMS;
 import independent_study.multiplayer.util.DispatchActivity;
 
-public class MainActivity extends DispatchActivity implements ListenerSMS, NfcAdapter.OnNdefPushCompleteCallback,
+public class MainActivity extends DispatchActivity implements ListenerSMS, NfcAdapter.OnNdefPushCompleteCallback
 {
     private BroadcastReceiverSMS receiverSMS;
     private InterpreterNFC interpreterNFC;
@@ -26,7 +26,25 @@ public class MainActivity extends DispatchActivity implements ListenerSMS, NfcAd
         receiverSMS.addListener(this);
 
         interpreterNFC = new InterpreterNFC(this);
-        interpreterNFC
+        this.addDispatchReceivers(interpreterNFC);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
     }
 
     public void onSMSReceived(SmsMessage message)
@@ -37,7 +55,10 @@ public class MainActivity extends DispatchActivity implements ListenerSMS, NfcAd
     @Override
     public void onNewIntent(Intent intent)
     {
-
+        if(intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED))
+        {
+            String nfcOuput = interpreterNFC.onNewNFCIntent(intent);
+        }
     }
 
     public void onNdefPushComplete(NfcEvent nfcEvent)
