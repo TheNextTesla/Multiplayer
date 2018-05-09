@@ -10,6 +10,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import independent_study.multiplayer.nfc.ListenerNFC;
+
 /**
  * Class Meant to Receive SMS Messages for Activation
  */
@@ -47,6 +49,14 @@ public class BroadcastReceiverSMS extends BroadcastReceiver
             listeners.add(listenerSMS);
             Log.d(LOG_TAG, "Listeners: " + listeners.size());
             return true;
+        }
+    }
+
+    public boolean removeListener(ListenerSMS listenerSMS)
+    {
+        synchronized (listeners)
+        {
+            return listeners.remove(listenerSMS);
         }
     }
 

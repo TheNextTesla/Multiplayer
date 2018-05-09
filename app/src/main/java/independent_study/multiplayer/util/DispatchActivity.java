@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public abstract class DispatchActivity extends AppCompatActivity
 {
-    protected final static ArrayList<DispatchReceiver> dispatchReceivers = new ArrayList<>();
+    protected final ArrayList<DispatchReceiver> dispatchReceivers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -66,13 +66,30 @@ public abstract class DispatchActivity extends AppCompatActivity
                 receiver.onDestroy();
             }
         }
+        removeDispatchReceivers();
     }
 
-    protected void addDispatchReceivers(DispatchReceiver... receivers)
+    public void addDispatchReceivers(DispatchReceiver... receivers)
     {
         synchronized (dispatchReceivers)
         {
             dispatchReceivers.addAll(Arrays.asList(receivers));
+        }
+    }
+
+    protected ArrayList<DispatchReceiver> getDispatchReceivers()
+    {
+        synchronized (dispatchReceivers)
+        {
+            return new ArrayList<>(dispatchReceivers);
+        }
+    }
+
+    protected void removeDispatchReceivers()
+    {
+        synchronized (dispatchReceivers)
+        {
+            dispatchReceivers.clear();
         }
     }
 }

@@ -10,24 +10,38 @@ import android.nfc.NfcEvent;
 import android.os.Parcelable;
 import android.provider.Settings;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
+import independent_study.multiplayer.util.DispatchActivity;
 import independent_study.multiplayer.util.DispatchReceiver;
 
-public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMessageCallback
+public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback
 {
+    private final ArrayList<ListenerNFC> listeners;
     private NfcAdapter nfcAdapter;
-    private Context context;
-    private byte[] payload;
+    private Activity activity;
+    private volatile byte[] payload;
     private final Object payloadLock;
     private boolean isNfcAdapterAvailable;
     private boolean isNfcAdapterSetup;
 
-    public InterpreterNFC(Context context)
+    public InterpreterNFC(Activity activity)
     {
-        nfcAdapter = NfcAdapter.getDefaultAdapter(context);
-        this.context = context;
+        nfcAdapter = NfcAdapter.getDefaultAdapter(activity.getApplicationContext());
+        listeners = new ArrayList<>();
+        this.activity = activity;
         payloadLock = new Object();
 
+        if(activity instanceof DispatchActivity)
+        {
+            ((DispatchActivity) activity).addDispatchReceivers(this);
+        }
+
         checkNfcStatus();
+
+        nfcAdapter.setOnNdefPushCompleteCallback(this, activity);
+        nfcAdapter.setNdefPushMessageCallback(this, activity);
     }
 
     @Override
@@ -41,16 +55,28 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
         NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], tempNfcMessage);
 
         records[0] = record;
-        records[1] = NdefRecord.createApplicationRecord(context.getPackageName());
+        records[1] = NdefRecord.createApplicationRecord(activity.getApplicationContext().getPackageName());
 
         setNfcMessage(null);
 
         return new NdefMessage(records);
     }
 
+    @Override
+    public void onNdefPushComplete(NfcEvent nfcEvent)
+    {
+        synchronized (listeners)
+        {
+            for(ListenerNFC listenerNFC : listeners)
+            {
+                listenerNFC.onNFCSent();
+            }
+        }
+    }
+
     public String onNewNFCIntent(Intent intent)
     {
-        Parcelable[] receivedArray =intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        Parcelable[] receivedArray = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
         if(receivedArray != null)
         {
@@ -63,9 +89,7 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
             {
                 String tempString = new String(attachedRecords[i].getPayload());
 
-                if (tempString.equals(context.getPackageName()))
-                    continue;
-                else
+                if (!tempString.equals(activity.getApplicationContext().getPackageName()))
                     builder.append(tempString);
             }
 
@@ -82,11 +106,33 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
 
         if(!isNfcAdapterAvailable)
         {
-            context.startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+            activity.startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
         }
         else if(!isNfcAdapterSetup)
         {
-            context.startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+            activity.startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+        }
+    }
+
+    public boolean addListener(ListenerNFC listenerNFC)
+    {
+        synchronized (listeners)
+        {
+            for (ListenerNFC listener : listeners)
+            {
+                if (listener == listenerNFC)
+                    return false;
+            }
+            listeners.add(listenerNFC);
+            return true;
+        }
+    }
+
+    public boolean removeListener(ListenerNFC listenerNFC)
+    {
+        synchronized (listeners)
+        {
+            return listeners.remove(listenerNFC);
         }
     }
 
@@ -133,5 +179,10 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
     public NfcAdapter getNfcAdapter()
     {
         return nfcAdapter;
+    }
+
+    public boolean isNfcWorking()
+    {
+        return isNfcAdapterAvailable && isNfcAdapterSetup;
     }
 }
