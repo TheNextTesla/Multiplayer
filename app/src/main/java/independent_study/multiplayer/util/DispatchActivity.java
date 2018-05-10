@@ -1,5 +1,7 @@
 package independent_study.multiplayer.util;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -91,5 +93,11 @@ public abstract class DispatchActivity extends AppCompatActivity
         {
             dispatchReceivers.clear();
         }
+    }
+
+    protected void goToActivity(Class<? extends Activity> activityClass)
+    {
+        Intent intent = new Intent(this.getBaseContext(), activityClass);
+        startActivity(intent);
     }
 }

@@ -39,9 +39,6 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
         }
 
         checkNfcStatus();
-
-        nfcAdapter.setOnNdefPushCompleteCallback(this, activity);
-        nfcAdapter.setNdefPushMessageCallback(this, activity);
     }
 
     @Override
@@ -101,8 +98,8 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
 
     private void checkNfcStatus()
     {
-        isNfcAdapterAvailable = nfcAdapter == null || !nfcAdapter.isEnabled();
-        isNfcAdapterSetup = nfcAdapter == null || !nfcAdapter.isNdefPushEnabled();
+        isNfcAdapterAvailable = nfcAdapter != null && nfcAdapter.isEnabled();
+        isNfcAdapterSetup = nfcAdapter != null && nfcAdapter.isNdefPushEnabled();
 
         if(!isNfcAdapterAvailable)
         {
@@ -111,6 +108,11 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
         else if(!isNfcAdapterSetup)
         {
             activity.startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+        }
+        else
+        {
+            nfcAdapter.setOnNdefPushCompleteCallback(this, activity);
+            nfcAdapter.setNdefPushMessageCallback(this, activity);
         }
     }
 
