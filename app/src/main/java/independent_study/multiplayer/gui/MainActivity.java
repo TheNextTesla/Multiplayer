@@ -20,11 +20,8 @@ import independent_study.multiplayer.sms.BroadcastReceiverSMS;
 import independent_study.multiplayer.sms.ListenerSMS;
 import independent_study.multiplayer.util.DispatchActivity;
 
-public class MainActivity extends DispatchActivity implements ListenerSMS, ListenerNFC
+public class MainActivity extends DispatchActivity
 {
-    private BroadcastReceiverSMS receiverSMS;
-    private InterpreterNFC interpreterNFC;
-
     private FlowingGradient flowingGradient;
     private RippleBackground rippleBackground;
     private Button hostButton;
@@ -35,12 +32,6 @@ public class MainActivity extends DispatchActivity implements ListenerSMS, Liste
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        receiverSMS = BroadcastReceiverSMS.getInstance();
-        receiverSMS.addListener(this);
-
-        //interpreterNFC = new InterpreterNFC(this);
-        //interpreterNFC.addListener(this);
 
         hostButton = findViewById(R.id.buttonHost);
         connectButton = findViewById(R.id.buttonConnect);
@@ -85,44 +76,6 @@ public class MainActivity extends DispatchActivity implements ListenerSMS, Liste
     }
 
     @Override
-    public void onSMSReceived(SmsMessage message)
-    {
-        Toast.makeText(this, "SMS Tag Received!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onNFCSent()
-    {
-        Toast.makeText(this, "NFC Tag Sent!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onNewIntent(Intent intent)
-    {
-        try
-        {
-            if(intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED))
-            {
-                //Effectively onNFCReceived
-                String nfcOutput = interpreterNFC.onNewNFCIntent(intent);
-
-                if(nfcOutput != null)
-                {
-                    Toast.makeText(this, "NFC Tag Received!", Toast.LENGTH_SHORT).show();
-                }
-            }
-            else
-            {
-                super.onNewIntent(intent);
-            }
-        }
-        catch (NullPointerException npe)
-        {
-            npe.printStackTrace();
-        }
-    }
-
-    @Override
     public void onStop()
     {
         super.onStop();
@@ -134,7 +87,5 @@ public class MainActivity extends DispatchActivity implements ListenerSMS, Liste
     public void onDestroy()
     {
         super.onDestroy();
-        //interpreterNFC.removeListener(this);
-        receiverSMS.removeListener(this);
     }
 }
