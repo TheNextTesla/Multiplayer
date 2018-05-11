@@ -1,7 +1,5 @@
 package independent_study.multiplayer.comm;
 
-import java.util.ArrayList;
-
 import static independent_study.multiplayer.comm.GameMessage.COMMUNICATION_METHOD.NFC;
 import static independent_study.multiplayer.comm.GameMessage.COMMUNICATION_METHOD.SMS;
 

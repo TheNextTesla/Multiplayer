@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -17,6 +19,8 @@ import independent_study.multiplayer.nfc.ListenerNFC;
 import independent_study.multiplayer.sms.BroadcastReceiverSMS;
 import independent_study.multiplayer.sms.ListenerSMS;
 import independent_study.multiplayer.util.DispatchActivity;
+
+import static independent_study.multiplayer.sms.TransmitterSMS.SENT;
 
 public class WaitForConnectionActivity extends DispatchActivity implements ListenerSMS, ListenerNFC
 {
@@ -90,7 +94,7 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
             if(intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED))
             {
                 //Effectively onNFCReceived
-                String nfcOutput = interpreterNFC.onNewNFCIntent(intent);
+                String nfcOutput = InterpreterNFC.onNewNFCIntent(intent, this);
 
                 if(nfcOutput != null)
                 {
@@ -105,6 +109,41 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
         catch (NullPointerException npe)
         {
             npe.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        String reponse = null;
+        switch (requestCode)
+        {
+            case SENT :
+                switch (resultCode)
+                {
+                    case RESULT_OK :
+                        reponse = "OK";
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE :
+                        reponse = "Generic Failure";
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF :
+                        reponse = "Radio Off";
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU :
+                        reponse = "Null Pdu";
+                        break;
+                }
+                break;
+        }
+
+        if (reponse != null)
+        {
+            Log.d("WaitForConnection", "Response: " + reponse);
+        }
+        else
+        {
+            Log.d("WaitForConnection", "ERROR SMS!");
         }
     }
 
@@ -140,6 +179,7 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
     protected void onStop()
     {
         super.onStop();
+        rippleBackground.stopRippleAnimation();
     }
 
     @Override

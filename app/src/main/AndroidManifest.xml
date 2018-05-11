@@ -3,10 +3,11 @@
     package="independent_study.multiplayer">
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="16"
         android:targetSdkVersion="27" />
 
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <uses-feature
         android:name="android.hardware.nfc"
@@ -35,8 +36,15 @@
             android:name=".sms.BroadcastReceiverSMS"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
+            <!--
             <intent-filter android:priority="999">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.DATA_SMS_RECEIVED" />
+                <data android:scheme="sms" />
+                <data android:port="8789" />
             </intent-filter>
         </receiver>
 
@@ -45,7 +53,7 @@
             android:label="@string/title_activity_settings" />
         <activity android:name=".gui.WaitForConnectionActivity" />
         <activity android:name=".gui.HostActivityNFC" />
-        <activity android:name=".gui.HostActivitySMS"></activity>
+        <activity android:name=".gui.HostActivitySMS" />
     </application>
 
 </manifest>

@@ -71,7 +71,7 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
         }
     }
 
-    public String onNewNFCIntent(Intent intent)
+    public static String onNewNFCIntent(Intent intent, Context context)
     {
         Parcelable[] receivedArray = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
@@ -86,7 +86,7 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
             {
                 String tempString = new String(attachedRecords[i].getPayload());
 
-                if (!tempString.equals(activity.getApplicationContext().getPackageName()))
+                if (!tempString.equals(context.getPackageName()))
                     builder.append(tempString);
             }
 
