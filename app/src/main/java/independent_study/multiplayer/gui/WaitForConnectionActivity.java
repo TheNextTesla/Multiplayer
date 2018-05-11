@@ -99,7 +99,6 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
                 if(nfcOutput != null)
                 {
                     Toast.makeText(this, "NFC Tag Received!", Toast.LENGTH_SHORT).show();
-
                 }
             }
             else

@@ -121,8 +121,10 @@ public class MainActivity extends DispatchActivity
     {
         if (requestCode == PERMISSIONS_KEY)
         {
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED ||
+            if((ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED ||
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED)
+                    && (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS) ||
+                    !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)))
             {
                 Toast.makeText(this, "Please Authorize Permissions", Toast.LENGTH_SHORT).show();
             }
