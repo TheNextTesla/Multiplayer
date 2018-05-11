@@ -10,7 +10,6 @@ import android.nfc.NfcEvent;
 import android.os.Parcelable;
 import android.provider.Settings;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import independent_study.multiplayer.util.DispatchActivity;

@@ -83,7 +83,7 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
     @Override
     public void onNFCSent()
     {
-        Toast.makeText(this, "NFC Tag Sent!", Toast.LENGTH_SHORT).show();
+        Log.e("WaitForConnection", "NFC SENT FROM WRONG ACTIVITY");
     }
 
     @Override
@@ -99,6 +99,7 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
                 if(nfcOutput != null)
                 {
                     Toast.makeText(this, "NFC Tag Received!", Toast.LENGTH_SHORT).show();
+
                 }
             }
             else
@@ -115,31 +116,32 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        String reponse = null;
+        String response = null;
         switch (requestCode)
         {
             case SENT :
+                //Effectively on Data SMS Sent
                 switch (resultCode)
                 {
                     case RESULT_OK :
-                        reponse = "OK";
+                        response = "OK";
                         break;
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE :
-                        reponse = "Generic Failure";
+                        response = "Generic Failure";
                         break;
                     case SmsManager.RESULT_ERROR_RADIO_OFF :
-                        reponse = "Radio Off";
+                        response = "Radio Off";
                         break;
                     case SmsManager.RESULT_ERROR_NULL_PDU :
-                        reponse = "Null Pdu";
+                        response = "Null Pdu";
                         break;
                 }
                 break;
         }
 
-        if (reponse != null)
+        if (response != null)
         {
-            Log.d("WaitForConnection", "Response: " + reponse);
+            Log.d("WaitForConnection", "Response: " + response);
         }
         else
         {

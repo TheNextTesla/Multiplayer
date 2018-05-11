@@ -4,40 +4,46 @@ import org.msgpack.core.MessageBufferPacker;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.buffer.MessageBuffer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 abstract class GameMessage
 {
     protected enum COMMUNICATION_METHOD { SMS, NFC, LAN, NETWORK }
-    protected static final MessageBufferPacker messagePack = MessagePack.newDefaultBufferPacker();
 
-    private String messageType;
-    private byte[] messageContents;
+    protected MessageBufferPacker mbp;
 
-    GameMessage(String messageType, byte[] messageContents)
+    GameMessage(String messageType)
     {
-        this.messageType = messageType;
-        this.messageContents = messageContents;
+        mbp = MessagePack.newDefaultBufferPacker();
+
+        try
+        {
+            mbp.packString(messageType);
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
     }
 
-    public byte[] generateOutputForSMS()
+    public byte[] closeAndGetMessageContent()
     {
-        return null;
+        try
+        {
+            mbp.close();
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+
+        return mbp.toByteArray();
     }
 
-    public byte[] generateOutputForNFC()
+    public MessageBufferPacker getMbp()
     {
-        return null;
-    }
-
-    public byte[] generateOutputForLAN()
-    {
-        return null;
-    }
-
-    public byte[] generateOutputForNETWORK()
-    {
-        return null;
+        return mbp;
     }
 
     public abstract boolean isComMethodValid(COMMUNICATION_METHOD method);
