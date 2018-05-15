@@ -54,7 +54,7 @@ public class MainActivity extends DispatchActivity
             @Override
             public void onClick(View view)
             {
-                goToActivity(HostActivityNFC.class);
+                goToActivity(HostActivitySMS.class);
             }
         });
 
@@ -104,10 +104,11 @@ public class MainActivity extends DispatchActivity
     private boolean checkAndCallPermissions()
     {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED)
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS )!= PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS,
-                    Manifest.permission.NFC}, PERMISSIONS_KEY);
+                    Manifest.permission.NFC, Manifest.permission.READ_CONTACTS}, PERMISSIONS_KEY);
             return false;
         }
         else
@@ -122,9 +123,11 @@ public class MainActivity extends DispatchActivity
         if (requestCode == PERMISSIONS_KEY)
         {
             if((ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED)
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED)
                     && (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS) ||
-                    !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)))
+                    !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC) ||
+                    !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)))
             {
                 Toast.makeText(this, "Please Authorize Permissions", Toast.LENGTH_SHORT).show();
             }

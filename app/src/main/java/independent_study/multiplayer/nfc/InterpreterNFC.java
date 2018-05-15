@@ -10,6 +10,9 @@ import android.nfc.NfcEvent;
 import android.os.Parcelable;
 import android.provider.Settings;
 
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessageUnpacker;
+
 import java.util.ArrayList;
 
 import independent_study.multiplayer.util.DispatchActivity;
@@ -70,7 +73,7 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
         }
     }
 
-    public static String onNewNFCIntent(Intent intent, Context context)
+    public static MessageUnpacker onNewNFCIntent(Intent intent, Context context)
     {
         Parcelable[] receivedArray = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
@@ -79,17 +82,26 @@ public class InterpreterNFC implements DispatchReceiver, NfcAdapter.CreateNdefMe
             NdefMessage receivedMessage = (NdefMessage) receivedArray[0];
             NdefRecord[] attachedRecords = receivedMessage.getRecords();
 
-            StringBuilder builder = new StringBuilder();
+            boolean hasPackageNameBeenIdentified = false;
+            MessageUnpacker messageUnpacker = null;
 
             for(int i = 0; i < attachedRecords.length; i++)
             {
                 String tempString = new String(attachedRecords[i].getPayload());
 
-                if (!tempString.equals(context.getPackageName()))
-                    builder.append(tempString);
+                if (tempString.equals(context.getPackageName()))
+                {
+                    hasPackageNameBeenIdentified = true;
+                    continue;
+                }
+
+                if(messageUnpacker == null)
+                {
+                    messageUnpacker = MessagePack.newDefaultUnpacker(attachedRecords[i].getPayload());
+                }
             }
 
-            return builder.toString();
+            return hasPackageNameBeenIdentified ? messageUnpacker : null;
         }
 
         return null;

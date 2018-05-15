@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.skyfishjy.library.RippleBackground;
 
+import org.msgpack.core.MessageUnpacker;
+
 import independent_study.multiplayer.R;
 import independent_study.multiplayer.nfc.InterpreterNFC;
 import independent_study.multiplayer.nfc.ListenerNFC;
@@ -94,7 +96,7 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
             if(intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED))
             {
                 //Effectively onNFCReceived
-                String nfcOutput = InterpreterNFC.onNewNFCIntent(intent, this);
+                MessageUnpacker nfcOutput = InterpreterNFC.onNewNFCIntent(intent, this);
 
                 if(nfcOutput != null)
                 {
