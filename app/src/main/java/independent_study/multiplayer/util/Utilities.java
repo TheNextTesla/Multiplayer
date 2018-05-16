@@ -14,6 +14,8 @@ import java.util.List;
  */
 public final class Utilities
 {
+    public static final int CONNECTION_PORT = 8789;
+
     public static String bytesToHex(byte[] bytes)
     {
         StringBuilder sbuf = new StringBuilder();
@@ -159,7 +161,17 @@ public final class Utilities
                     }
                 }
             }
-        } catch (Exception ignored) { } // for now eat exceptions
+        }
+        catch (Exception ignored) { } // for now eat exceptions
         return "";
+    }
+
+    public static byte[] intToByteArray(int value)
+    {
+        return new byte[] {
+                (byte)(value >>> 24),
+                (byte)(value >>> 16),
+                (byte)(value >>> 8),
+                (byte)value};
     }
 }

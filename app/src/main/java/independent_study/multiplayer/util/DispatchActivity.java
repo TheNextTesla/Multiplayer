@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,6 +99,16 @@ public abstract class DispatchActivity extends AppCompatActivity
     protected void goToActivity(Class<? extends Activity> activityClass)
     {
         Intent intent = new Intent(this.getBaseContext(), activityClass);
+        startActivity(intent);
+    }
+
+    protected void goToActivity(Class<? extends Activity> activityClass, Pair<String, Bundle>... pairs)
+    {
+        Intent intent = new Intent(this.getBaseContext(), activityClass);
+        for(Pair<String, Bundle> pair : pairs)
+        {
+            intent.putExtra(pair.first, pair.second);
+        }
         startActivity(intent);
     }
 }

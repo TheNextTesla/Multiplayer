@@ -1,9 +1,16 @@
 package independent_study.multiplayer.comm;
 
 
+import org.msgpack.core.MessageUnpacker;
+
 public class GameHeartbeatMessage extends GameMessage
 {
-    protected static final String type = "beat";
+    public static final String type = "beat";
+
+    public static GameHeartbeatMessage generateHeartbeatMessage(MessageUnpacker messageUnpacker)
+    {
+        return new GameHeartbeatMessage();
+    }
 
     public GameHeartbeatMessage()
     {

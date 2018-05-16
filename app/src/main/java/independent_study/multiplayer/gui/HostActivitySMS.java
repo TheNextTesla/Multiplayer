@@ -1,45 +1,52 @@
 package independent_study.multiplayer.gui;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.pm.PackageManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.DataSetObserver;
-import android.icu.text.LocaleDisplayNames;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.util.Pair;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 import independent_study.multiplayer.R;
-import independent_study.multiplayer.sms.BroadcastReceiverSMS;
+import independent_study.multiplayer.comm.GameInitiationMessage;
+import independent_study.multiplayer.sms.TransmitterSMS;
 import independent_study.multiplayer.util.DispatchActivity;
+import independent_study.multiplayer.util.Utilities;
 
 public class HostActivitySMS extends DispatchActivity
 {
     private ListView listView;
     private EditText editText;
+    private FloatingActionButton fabSendSMS;
     private ArrayAdapter<String> arrayAdapter;
+    private HostActivitySMS hostActivitySMS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host_sms);
+        hostActivitySMS = this;
 
         listView = findViewById(R.id.listViewHostSMS);
         editText = findViewById(R.id.editTextHostSMS);
+        fabSendSMS = findViewById(R.id.floatingActionButtonSendSMS);
         arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, android.R.id.text1);
 
         editText.addTextChangedListener(new TextWatcher()
@@ -86,6 +93,41 @@ public class HostActivitySMS extends DispatchActivity
                 catch (Exception ex)
                 {
                     ex.printStackTrace();
+                }
+            }
+        });
+
+        fabSendSMS.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                try
+                {
+                    long phoneNumber = Long.parseLong(editText.getText().toString());
+
+                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+                    GameInitiationMessage gameStart = new GameInitiationMessage(wifiInfo.getSSID(),
+                            Utilities.intToByteArray(wifiInfo.getIpAddress()));
+
+                    TransmitterSMS.getInstance().sendDataSMS(phoneNumber, gameStart.closeAndGetMessageContent(), hostActivitySMS);
+                    displayNotification("Sent SMS!", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            Bundle bundle = new Bundle();
+                            bundle.putBoolean(GameActivity.IS_HOST_BUNDLE_KEY, true);
+                            goToActivity(GameActivity.class, new Pair<>(GameActivity.GAME_SETUP_BUNDLE_KEY, bundle));
+                        }
+                    }, hostActivitySMS);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    displayNotification("Cannot Send SMS", null, hostActivitySMS);
                 }
             }
         });
@@ -218,5 +260,22 @@ public class HostActivitySMS extends DispatchActivity
         }
 
         return contactNumber.contains(spaceBuilder.toString()) || contactNumber.contains(parenBuilder.toString());
+    }
+
+    private void displayNotification(String notification, DialogInterface.OnClickListener listener, Context context)
+    {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        }
+        else
+        {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder.setTitle(notification);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.setNeutralButton("OK", listener);
+        builder.show();
     }
 }
