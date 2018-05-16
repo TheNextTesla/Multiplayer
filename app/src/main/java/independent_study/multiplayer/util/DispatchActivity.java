@@ -1,7 +1,11 @@
 package independent_study.multiplayer.util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
@@ -110,5 +114,22 @@ public abstract class DispatchActivity extends AppCompatActivity
             intent.putExtra(pair.first, pair.second);
         }
         startActivity(intent);
+    }
+
+    protected void displayNotification(String notification, DialogInterface.OnClickListener listener, Context context)
+    {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        }
+        else
+        {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder.setTitle(notification);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.setNeutralButton("OK", listener);
+        builder.show();
     }
 }

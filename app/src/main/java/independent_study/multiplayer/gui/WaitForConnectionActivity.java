@@ -1,12 +1,16 @@
 package independent_study.multiplayer.gui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -16,6 +20,7 @@ import com.skyfishjy.library.RippleBackground;
 import org.msgpack.core.MessageUnpacker;
 
 import independent_study.multiplayer.R;
+import independent_study.multiplayer.comm.GameInitiationMessage;
 import independent_study.multiplayer.nfc.InterpreterNFC;
 import independent_study.multiplayer.nfc.ListenerNFC;
 import independent_study.multiplayer.sms.BroadcastReceiverSMS;
@@ -101,6 +106,24 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
                 if(nfcOutput != null)
                 {
                     Toast.makeText(this, "NFC Tag Received!", Toast.LENGTH_SHORT).show();
+                    GameInitiationMessage gim = GameInitiationMessage.generateInitiationMessage(nfcOutput);
+
+                    String hostname = gim.getHostname();
+                    byte[] ipAddress = gim.getIpAddress();
+
+                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                    
+                    if(hostname.equals(wifiInfo.getSSID()))
+                    {
+                        Bundle bundle = new Bundle();
+                        bundle.putByteArray(GameActivity.IP_BYTE_BUNDLE_KEY, ipAddress);
+                        goToActivity(GameActivity.class, new Pair<>(GameActivity.GAME_SETUP_BUNDLE_KEY, bundle));
+                    }
+                    else
+                    {
+                        displayNotification("You Must Be On the Same Network!", null, this);
+                    }
                 }
             }
             else

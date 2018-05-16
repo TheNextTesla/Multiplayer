@@ -261,21 +261,4 @@ public class HostActivitySMS extends DispatchActivity
 
         return contactNumber.contains(spaceBuilder.toString()) || contactNumber.contains(parenBuilder.toString());
     }
-
-    private void displayNotification(String notification, DialogInterface.OnClickListener listener, Context context)
-    {
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
-        }
-        else
-        {
-            builder = new AlertDialog.Builder(context);
-        }
-        builder.setTitle(notification);
-        builder.setIcon(android.R.drawable.ic_dialog_alert);
-        builder.setNeutralButton("OK", listener);
-        builder.show();
-    }
 }

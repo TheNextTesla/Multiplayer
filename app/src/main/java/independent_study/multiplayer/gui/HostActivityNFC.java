@@ -1,7 +1,9 @@
 package independent_study.multiplayer.gui;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -62,7 +64,18 @@ public class HostActivityNFC extends DispatchActivity implements ListenerNFC
     @Override
     public void onNFCSent()
     {
-        Toast.makeText(this, "NFC Tag Sent!", Toast.LENGTH_SHORT).show();
+        //TODO: Fix nfc Sending Message setNfcMessage(byte[] nfcMessage)
+
+        displayNotification("Sent SMS!", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(GameActivity.IS_HOST_BUNDLE_KEY, true);
+                goToActivity(GameActivity.class, new Pair<>(GameActivity.GAME_SETUP_BUNDLE_KEY, bundle));
+            }
+        }, this);
     }
 
     @Override

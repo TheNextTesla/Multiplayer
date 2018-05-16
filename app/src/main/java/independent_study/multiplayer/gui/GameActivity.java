@@ -11,6 +11,7 @@ import independent_study.multiplayer.util.DispatchActivity;
 public class GameActivity extends DispatchActivity
 {
     public static final String IS_HOST_BUNDLE_KEY = "isHost";
+    public static final String IP_BYTE_BUNDLE_KEY = "ip";
     public static final String GAME_SETUP_BUNDLE_KEY = "GameSetup";
 
     private GameConnection gameConnection;
@@ -41,7 +42,6 @@ public class GameActivity extends DispatchActivity
 
     private void setUpConnection(Bundle gameSetup)
     {
-        //TODO: Get IP Address for Game Connection
-        gameConnection = new GameConnection();
+        gameConnection = new GameConnection(gameSetup.getByteArray(IP_BYTE_BUNDLE_KEY));
     }
 }
