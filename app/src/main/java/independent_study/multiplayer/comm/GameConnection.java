@@ -1,6 +1,7 @@
 package independent_study.multiplayer.comm;
 
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import java.io.IOException;
@@ -16,8 +17,8 @@ public class GameConnection extends Thread
 {
     private volatile boolean isRunning;
     private volatile boolean isConnected;
-    private ArrayList<GameServerThread> serverThreads;
-    private ArrayList<GameMessage> receivedMessages;
+    private final ArrayList<GameServerThread> serverThreads;
+    private final ArrayList<GameMessage> receivedMessages;
     private boolean isHost;
 
     private byte[] ipAddressOther;
@@ -46,6 +47,7 @@ public class GameConnection extends Thread
         isRunning = true;
         isConnected = false;
         serverThreads = new ArrayList<>();
+        receivedMessages = new ArrayList<>();
         this.ipAddressOther = ipAddressOther;
     }
 
@@ -58,6 +60,11 @@ public class GameConnection extends Thread
             runIfConnector();
     }
 
+    public void onGameContentUpdateReceived(GameContentMessage gcm)
+    {
+
+    }
+
     private void runIfHost()
     {
         while(isRunning)
@@ -67,7 +74,11 @@ public class GameConnection extends Thread
                 Socket socket = serverSocket.accept();
                 GameServerThread gst = new GameServerThread(socket, this);
                 gst.start();
-                serverThreads.add(gst);
+
+                synchronized (serverThreads)
+                {
+                    serverThreads.add(gst);
+                }
             }
             catch (IOException ioe)
             {
@@ -107,7 +118,11 @@ public class GameConnection extends Thread
 
         GameServerThread gst = new GameServerThread(connectionSocket, this);
         gst.start();
-        serverThreads.add(gst);
+
+        synchronized (serverThreads)
+        {
+            serverThreads.add(gst);
+        }
 
         while(isRunning)
         {
@@ -125,6 +140,37 @@ public class GameConnection extends Thread
 
     private void maintainConnection()
     {
+        long lastHeartbeatMessageReceived = 0;
+        synchronized (serverThreads)
+        {
+            for (GameServerThread thread : serverThreads)
+            {
+                if (thread.getLastHeartbeat() > lastHeartbeatMessageReceived)
+                    lastHeartbeatMessageReceived = thread.getLastHeartbeat();
+            }
+        }
 
+        isConnected = System.currentTimeMillis() - lastHeartbeatMessageReceived < 500;
+
+        if(!isConnected)
+        {
+            Log.d("GameConnection", "Not Connected");
+        }
+        else
+        {
+            synchronized (serverThreads)
+            {
+                if(serverThreads.size() > 1)
+                {
+                    for (int i = serverThreads.size() - 1; i > 0; i--)
+                    {
+                        if (System.currentTimeMillis() - serverThreads.get(i).getLastHeartbeat() > 550)
+                        {
+                            serverThreads.remove(i);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

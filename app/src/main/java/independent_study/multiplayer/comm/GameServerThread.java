@@ -1,5 +1,7 @@
 package independent_study.multiplayer.comm;
 
+import android.util.Log;
+
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessageUnpacker;
 
@@ -7,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class GameServerThread extends Thread
 {
@@ -32,7 +35,6 @@ public class GameServerThread extends Thread
             MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(inputStream);
             while(isRunning)
             {
-                GameMessage gim = null;
                 if(unpacker.hasNext())
                 {
                     try
@@ -41,16 +43,19 @@ public class GameServerThread extends Thread
                         switch (messageType)
                         {
                             case GameInitiationMessage.type:
-                                gim = GameInitiationMessage.generateInitiationMessage(unpacker);
-                                //TODO: Ignore Network-Sent Game Initiation Messages
+                                GameInitiationMessage gim = GameInitiationMessage.generateInitiationMessage(unpacker);
+                                Log.d("GameServerThread", "Lost GIM Found @ " + Arrays.toString(gim.getIpAddress()));
                                 break;
                             case GameHeartbeatMessage.type:
-                                gim = GameHeartbeatMessage.generateHeartbeatMessage(unpacker);
+                                GameHeartbeatMessage ghm = GameHeartbeatMessage.generateHeartbeatMessage(unpacker);
                                 lastHeartbeat = System.currentTimeMillis();
-                                write(gim.closeAndGetMessageContent());
+                                write(ghm.closeAndGetMessageContent());
                                 break;
+                            case GameContentMessage.type:
+                                GameContentMessage gcm = GameContentMessage.generateContentMessage(unpacker);
+                                gameConnection.onGameContentUpdateReceived(gcm);
                             default:
-                                //TODO: How to react to unknown messages
+                                //TODO: How to react to unknown messages?
                                 break;
                         }
                     }
@@ -79,6 +84,11 @@ public class GameServerThread extends Thread
         {
             ioe.printStackTrace();
         }
+    }
+
+    public long getLastHeartbeat()
+    {
+        return lastHeartbeat;
     }
 
     public void stopConnection()
