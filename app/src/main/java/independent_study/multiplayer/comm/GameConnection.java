@@ -60,9 +60,12 @@ public class GameConnection extends Thread
             runIfConnector();
     }
 
-    public void onGameContentUpdateReceived(GameContentMessage gcm)
+    public void onGameUpdateReceived(GameMessage gcm)
     {
-
+        synchronized (receivedMessages)
+        {
+            receivedMessages.add(gcm);
+        }
     }
 
     private void runIfHost()
@@ -172,5 +175,20 @@ public class GameConnection extends Thread
                 }
             }
         }
+    }
+
+    public ArrayList<GameMessage> getGameMessages()
+    {
+        ArrayList<GameMessage> gameMessages = new ArrayList<>();
+        synchronized (receivedMessages)
+        {
+            gameMessages.addAll(receivedMessages);
+        }
+        return gameMessages;
+    }
+
+    public boolean isConnected()
+    {
+        return isConnected;
     }
 }

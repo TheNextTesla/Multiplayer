@@ -53,7 +53,7 @@ public class GameServerThread extends Thread
                                 break;
                             case GameContentMessage.type:
                                 GameContentMessage gcm = GameContentMessage.generateContentMessage(unpacker);
-                                gameConnection.onGameContentUpdateReceived(gcm);
+                                gameConnection.onGameUpdateReceived(gcm);
                             default:
                                 //TODO: How to react to unknown messages?
                                 break;
