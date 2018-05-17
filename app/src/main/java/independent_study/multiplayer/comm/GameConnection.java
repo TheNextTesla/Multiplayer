@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import independent_study.multiplayer.util.DispatchActivity;
 import independent_study.multiplayer.util.DispatchReceiver;
 import independent_study.multiplayer.util.Utilities;
 
@@ -21,14 +22,19 @@ public class GameConnection extends Thread implements DispatchReceiver
 
     private byte[] ipAddressOther;
     private ServerSocket serverSocket;
+    private NetworkGameListener ngl;
 
-    public GameConnection()
+    public GameConnection(NetworkGameListener ngl, DispatchActivity dispatchActivity)
     {
         isHost = true;
         isRunning = true;
         isConnected = false;
         serverThreads = new ArrayList<>();
         receivedMessages = new ArrayList<>();
+
+        this.ngl = ngl;
+        dispatchActivity.addDispatchReceivers(this);
+
         try
         {
             serverSocket = new ServerSocket(Utilities.CONNECTION_PORT);
@@ -39,7 +45,7 @@ public class GameConnection extends Thread implements DispatchReceiver
         }
     }
 
-    public GameConnection(byte[] ipAddressOther)
+    public GameConnection(NetworkGameListener ngl, DispatchActivity dispatchActivity, byte[] ipAddressOther)
     {
         isHost = false;
         isRunning = true;
@@ -47,6 +53,9 @@ public class GameConnection extends Thread implements DispatchReceiver
         serverThreads = new ArrayList<>();
         receivedMessages = new ArrayList<>();
         this.ipAddressOther = ipAddressOther;
+
+        this.ngl = ngl;
+        dispatchActivity.addDispatchReceivers(this);
     }
 
     @Override
@@ -64,6 +73,7 @@ public class GameConnection extends Thread implements DispatchReceiver
         {
             receivedMessages.add(gcm);
         }
+        ngl.onGameUpdateReceived(gcm, getGameMessages());
     }
 
     private void runIfHost()

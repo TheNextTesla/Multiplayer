@@ -8,13 +8,13 @@ import org.msgpack.core.buffer.MessageBuffer;
 import java.io.IOException;
 import java.util.ArrayList;
 
-abstract class GameMessage
+public abstract class GameMessage
 {
     protected enum COMMUNICATION_METHOD { SMS, NFC, LAN, NETWORK }
 
     protected MessageBufferPacker mbp;
 
-    GameMessage(String messageType)
+    public GameMessage(String messageType)
     {
         mbp = MessagePack.newDefaultBufferPacker();
 
