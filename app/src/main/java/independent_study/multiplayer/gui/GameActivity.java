@@ -22,7 +22,7 @@ public class GameActivity extends DispatchActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        Bundle gameSetup = savedInstanceState.getBundle(GAME_SETUP_BUNDLE_KEY);
+        Bundle gameSetup = getIntent().getExtras();
         boolean isHost = gameSetup.getBoolean(IS_HOST_BUNDLE_KEY);
 
         if(isHost)

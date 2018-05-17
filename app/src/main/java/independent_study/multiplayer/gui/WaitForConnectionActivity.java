@@ -113,7 +113,7 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
 
                     WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                     WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                    
+
                     if(hostname.equals(wifiInfo.getSSID()))
                     {
                         Bundle bundle = new Bundle();

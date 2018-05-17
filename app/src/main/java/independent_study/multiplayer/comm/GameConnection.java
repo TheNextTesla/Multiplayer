@@ -1,8 +1,6 @@
 package independent_study.multiplayer.comm;
 
-import android.content.pm.PackageManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -10,10 +8,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import independent_study.multiplayer.nfc.InterpreterNFC;
+import independent_study.multiplayer.util.DispatchReceiver;
 import independent_study.multiplayer.util.Utilities;
 
-public class GameConnection extends Thread
+public class GameConnection extends Thread implements DispatchReceiver
 {
     private volatile boolean isRunning;
     private volatile boolean isConnected;
@@ -175,6 +173,30 @@ public class GameConnection extends Thread
                 }
             }
         }
+    }
+
+    @Override
+    public void onResume()
+    {
+        maintainConnection();
+    }
+
+    @Override
+    public void onPause()
+    {
+        //TODO: Functionality on Pause?
+    }
+
+    @Override
+    public void onStop()
+    {
+        //TODO: Functionality on Stop?
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        isRunning = false;
     }
 
     public ArrayList<GameMessage> getGameMessages()
