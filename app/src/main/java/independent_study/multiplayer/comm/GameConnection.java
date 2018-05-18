@@ -16,6 +16,8 @@ public class GameConnection extends Thread implements DispatchReceiver
 {
     private volatile boolean isRunning;
     private volatile boolean isConnected;
+    private volatile boolean wasConnected;
+    private volatile boolean everConnected;
     private final ArrayList<GameServerThread> serverThreads;
     private final ArrayList<GameMessage> receivedMessages;
     private boolean isHost;
@@ -28,6 +30,8 @@ public class GameConnection extends Thread implements DispatchReceiver
     {
         isHost = true;
         isRunning = true;
+        everConnected = false;
+        wasConnected = false;
         isConnected = false;
         serverThreads = new ArrayList<>();
         receivedMessages = new ArrayList<>();
@@ -49,6 +53,8 @@ public class GameConnection extends Thread implements DispatchReceiver
     {
         isHost = false;
         isRunning = true;
+        everConnected = false;
+        wasConnected = false;
         isConnected = false;
         serverThreads = new ArrayList<>();
         receivedMessages = new ArrayList<>();
@@ -161,11 +167,24 @@ public class GameConnection extends Thread implements DispatchReceiver
             }
         }
 
+        wasConnected = isConnected;
         isConnected = System.currentTimeMillis() - lastHeartbeatMessageReceived < 500;
 
-        if(!isConnected)
+        if(isConnected && !wasConnected)
         {
-            Log.d("GameConnection", "Not Connected");
+            if(!everConnected)
+            {
+                ngl.onGameConnectionStarted();
+                everConnected = true;
+            }
+            else
+            {
+                ngl.onGameConnectionFound();
+            }
+        }
+        else if(!isConnected && wasConnected)
+        {
+            ngl.onGameConnectionLost();
         }
         else
         {
