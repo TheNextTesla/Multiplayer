@@ -77,6 +77,6 @@ public class GameActivity extends DispatchActivity implements NetworkGameListene
     @Override
     public void onGameConnectionStopped()
     {
-
+        finish();
     }
 }
