@@ -204,6 +204,18 @@ public class GameConnection extends Thread implements DispatchReceiver
         }
     }
 
+    public void send(GameMessage message)
+    {
+        byte[] messageContent = message.closeAndGetMessageContent();
+        synchronized (serverThreads)
+        {
+            for(GameServerThread gst : serverThreads)
+            {
+                gst.write(messageContent);
+            }
+        }
+    }
+
     @Override
     public void onResume()
     {
