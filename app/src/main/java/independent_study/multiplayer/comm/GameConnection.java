@@ -231,7 +231,7 @@ public class GameConnection extends Thread implements DispatchReceiver
     @Override
     public void onStop()
     {
-        //TODO: Functionality on Stop?
+        ngl.onGameConnectionStopped();
     }
 
     @Override
