@@ -24,6 +24,7 @@ import independent_study.multiplayer.util.DispatchActivity;
 
 public class GameActivity extends DispatchActivity implements NetworkGameListener
 {
+    private static final String LOG_TAG = "GameActivity";
     public static final String IS_HOST_BUNDLE_KEY = "isHost";
     public static final String IP_BYTE_BUNDLE_KEY = "ip";
     public static final String GAME_SETUP_BUNDLE_KEY = "GameSetup";
@@ -78,7 +79,7 @@ public class GameActivity extends DispatchActivity implements NetworkGameListene
         }
         else
         {
-            Log.d("GameActivity", "Game Update Not Recognized");
+            Log.d(LOG_TAG, "Game Update Not Recognized");
         }
     }
 

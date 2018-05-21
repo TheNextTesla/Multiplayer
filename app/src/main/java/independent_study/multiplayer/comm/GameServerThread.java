@@ -13,6 +13,8 @@ import java.util.Arrays;
 
 public class GameServerThread extends Thread
 {
+    private static final String LOG_TAG = "GameServerThread";
+
     private Socket socket;
     private GameConnection gameConnection;
     private volatile long lastHeartbeat;
@@ -44,7 +46,7 @@ public class GameServerThread extends Thread
                         {
                             case GameInitiationMessage.type:
                                 GameInitiationMessage gim = GameInitiationMessage.generateInitiationMessage(unpacker);
-                                Log.d("GameServerThread", "Lost GIM Found @ " + Arrays.toString(gim.getIpAddress()));
+                                Log.d(LOG_TAG, "Lost GIM Found @ " + Arrays.toString(gim.getIpAddress()));
                                 break;
                             case GameHeartbeatMessage.type:
                                 GameHeartbeatMessage ghm = GameHeartbeatMessage.generateHeartbeatMessage(unpacker);

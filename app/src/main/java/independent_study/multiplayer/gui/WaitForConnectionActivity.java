@@ -31,6 +31,8 @@ import static independent_study.multiplayer.sms.TransmitterSMS.SENT;
 
 public class WaitForConnectionActivity extends DispatchActivity implements ListenerSMS, ListenerNFC
 {
+    private static final String LOG_TAG = "WaitForConnection";
+
     private BroadcastReceiverSMS receiverSMS;
     private InterpreterNFC interpreterNFC;
 
@@ -165,11 +167,11 @@ public class WaitForConnectionActivity extends DispatchActivity implements Liste
 
         if (response != null)
         {
-            Log.d("WaitForConnection", "Response: " + response);
+            Log.d(LOG_TAG, "Response: " + response);
         }
         else
         {
-            Log.d("WaitForConnection", "ERROR SMS!");
+            Log.d(LOG_TAG, "ERROR SMS!");
         }
     }
 

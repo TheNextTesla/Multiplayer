@@ -1,7 +1,5 @@
 package independent_study.multiplayer.comm;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
@@ -231,13 +229,30 @@ public class GameConnection extends Thread implements DispatchReceiver
     @Override
     public void onStop()
     {
+        isRunning = false;
+        isConnected = false;
         ngl.onGameConnectionStopped();
+        try
+        {
+            if (serverSocket != null)
+                serverSocket.close();
+
+            for(GameServerThread thread : serverThreads)
+            {
+                thread.stopConnection();
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void onDestroy()
     {
         isRunning = false;
+        ngl = null;
     }
 
     public ArrayList<GameMessage> getGameMessages()

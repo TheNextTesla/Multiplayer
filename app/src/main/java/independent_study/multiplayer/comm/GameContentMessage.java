@@ -1,7 +1,5 @@
 package independent_study.multiplayer.comm;
 
-import android.os.Message;
-
 import org.msgpack.core.MessageUnpacker;
 
 import java.io.IOException;
